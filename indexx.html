@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="description" content="Game Tic-Tac-Toe dengan maskot anime interaktif. Hadapi NPC cerdas dengan empat tingkat kesulitan, dari mudah hingga mustahil. Nikmati animasi maskot yang lucu dan tema hangat.">
+  <meta name="author" content="Studio Maskot">
+  <meta name="theme-color" content="#f9f0e8">
+  <meta name="color-scheme" content="light dark">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="TTT Maskot">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta property="og:type" content="game">
+  <meta property="og:title" content="Tic-Tac-Toe Maskot Interaktif">
+  <meta property="og:description" content="Game Tic-Tac-Toe dengan maskot anime interaktif. Hadapi NPC cerdas dengan empat tingkat kesulitan, dari mudah hingga mustahil.">
+  <meta property="og:locale" content="id_ID">
+  <meta property="og:site_name" content="TTT Maskot">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Tic-Tac-Toe Maskot Interaktif">
+  <meta name="twitter:description" content="Game Tic-Tac-Toe dengan maskot anime interaktif. Hadapi NPC cerdas dengan empat tingkat kesulitan.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 85 L20 50 A20 20 0 0 1 50 30 A20 20 0 0 1 80 50 Z' fill='%23b83b2e'/%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 85 L20 50 A20 20 0 0 1 50 30 A20 20 0 0 1 80 50 Z' fill='%23b83b2e'/%3E%3C/svg%3E">
+  <title>Tic-Tac-Toe Maskot Interaktif</title>
+  <style>
+    :root {
+      --color-bg: #f9f0e8;
+      --color-surface: #fff9f5;
+      --color-primary: #b83b2e;
+      --color-primary-light: #e85d4a;
+      --color-accent: #f7c548;
+      --color-dark: #3a2a24;
+      --color-text: #3a2a24;
+      --color-text-light: #6b5a52;
+      --color-border: #3a2a24;
+      --font-display: 'Georgia', 'Times New Roman', serif;
+      --font-body: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', sans-serif;
+      --spacing-1: 0.25rem;
+      --spacing-2: 0.5rem;
+      --spacing-3: 0.75rem;
+      --spacing-4: 1rem;
+      --spacing-5: 1.5rem;
+      --spacing-6: 2rem;
+      --spacing-7: 3rem;
+      --spacing-8: 4rem;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%;
+      font-size: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      height: 100%;
+      overflow: hidden;
+      overscroll-behavior: none;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    #app {
+      width: 100%;
+      max-width: 480px;
+      height: 100dvh;
+      margin: 0 auto;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      padding-top: var(--spacing-4);
+      padding-bottom: var(--spacing-4);
+      display: flex;
+      flex-direction: column;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      align-items: center;
+    }
+
+    .screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      gap: var(--spacing-5);
+      padding: 0 var(--spacing-3);
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    .display {
+      font-family: var(--font-display);
+      letter-spacing: -0.02em;
+      color: var(--color-dark);
+    }
+
+    h1.display { font-size: 2.5rem; }
+    h2.display { font-size: 2rem; }
+    h3 { font-size: 1.25rem; font-family: var(--font-display); }
+
+    .subtitle {
+      color: var(--color-text-light);
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    .app-header {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-2);
+    }
+
+    .mascot-container {
+      width: 100%;
+      max-width: 180px;
+      margin: 0 auto;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .mascot-small {
+      max-width: 120px;
+    }
+
+    .mascot-svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .mascot-container { animation: none; }
+    }
+
+    .menu-actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-3);
+      width: 100%;
+      max-width: 280px;
+    }
+
+    .btn {
+      font-family: var(--font-body);
+      font-size: 1.125rem;
+      font-weight: bold;
+      padding: var(--spacing-3) var(--spacing-4);
+      min-height: 48px;
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.1s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+    }
+
+    .btn:focus-visible {
+      outline: 3px solid var(--color-accent);
+      outline-offset: 2px;
+    }
+
+    .btn:active {
+      transform: translateY(2px);
+    }
+
+    .btn-primary {
+      background-color: var(--color-accent);
+      color: var(--color-dark);
+    }
+
+    .btn-primary:hover {
+      background-color: #f5b82e;
+    }
+
+    .btn-secondary {
+      background-color: var(--color-surface);
+      color: var(--color-dark);
+    }
+
+    .btn-secondary:hover {
+      background-color: #f0e8e0;
+    }
+
+    .btn-toggle {
+      background-color: var(--color-surface);
+      color: var(--color-dark);
+    }
+
+    .btn-text {
+      background: none;
+      border: none;
+      color: var(--color-primary);
+      text-decoration: underline;
+      font-size: 1rem;
+      min-height: 44px;
+    }
+
+    .btn-text:hover {
+      color: var(--color-primary-light);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .settings-panel {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-3);
+      width: 100%;
+      max-width: 280px;
+      margin-top: var(--spacing-4);
+      padding: var(--spacing-4);
+      background: var(--color-surface);
+      border-radius: var(--radius-md);
+      border: 2px solid var(--color-border);
+    }
+
+    .settings-label {
+      font-weight: bold;
+      font-size: 0.9rem;
+      color: var(--color-text-light);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .select {
+      font-family: var(--font-body);
+      font-size: 1rem;
+      padding: var(--spacing-2) var(--spacing-3);
+      min-height: 44px;
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      background: var(--color-surface);
+      color: var(--color-text);
+      cursor: pointer;
+    }
+
+    .select:focus-visible {
+      outline: 3px solid var(--color-accent);
+    }
+
+    .app-footer {
+      margin-top: auto;
+      padding-top: var(--spacing-4);
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--color-text-light);
+    }
+
+    .game-header {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-2);
+    }
+
+    .scoreboard {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      max-width: 320px;
+      background: var(--color-surface);
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-2) var(--spacing-3);
+    }
+
+    .score-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-1);
+    }
+
+    .score-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: var(--color-text-light);
+      letter-spacing: 0.05em;
+    }
+
+    .score-value {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--color-primary);
+      font-family: var(--font-display);
+    }
+
+    .status-message {
+      font-size: 1rem;
+      font-weight: bold;
+      color: var(--color-primary);
+      text-align: center;
+      min-height: 1.5em;
+      padding: var(--spacing-2) var(--spacing-3);
+      background: var(--color-surface);
+      border-radius: var(--radius-sm);
+      border: 2px solid var(--color-border);
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--spacing-2);
+      width: 100%;
+      max-width: 320px;
+      aspect-ratio: 1;
+      background: var(--color-surface);
+      border: 3px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--spacing-2);
+    }
+
+    .cell {
+      background: var(--color-bg);
+      border: 2px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--spacing-1);
+      transition: background-color 0.1s;
+      -webkit-appearance: none;
+      appearance: none;
+      touch-action: manipulation;
+      min-width: 0;
+      min-height: 0;
+    }
+
+    .cell:hover:not(:disabled) {
+      background-color: #f0e0d8;
+    }
+
+    .cell:focus-visible {
+      outline: 3px solid var(--color-accent);
+      outline-offset: -3px;
+      z-index: 1;
+    }
+
+    .cell:disabled {
+      cursor: not-allowed;
+      opacity: 0.8;
+    }
+
+    .mark-svg {
+      width: 80%;
+      height: 80%;
+      display: block;
+    }
+
+    .game-controls {
+      display: flex;
+      gap: var(--spacing-3);
+      width: 100%;
+      max-width: 320px;
+    }
+
+    .game-controls .btn {
+      flex: 1;
+    }
+
+    .howto-content {
+      width: 100%;
+      max-width: 400px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-3);
+      background: var(--color-surface);
+      padding: var(--spacing-4);
+      border-radius: var(--radius-md);
+      border: 2px solid var(--color-border);
+    }
+
+    .howto-content ul {
+      padding-left: var(--spacing-5);
+      list-style: disc;
+    }
+
+    .howto-content li {
+      margin-bottom: var(--spacing-1);
+    }
+
+    kbd {
+      background: var(--color-dark);
+      color: var(--color-surface);
+      padding: 0 var(--spacing-1);
+      border-radius: 4px;
+      font-size: 0.875em;
+      font-family: monospace;
+    }
+
+    .overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(58, 42, 36, 0.9);
+      justify-content: center;
+      align-items: center;
+      padding: var(--spacing-4);
+      z-index: 10000;
+    }
+
+    .overlay.active {
+      display: flex;
+    }
+
+    .overlay-content {
+      background: var(--color-bg);
+      border: 3px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--spacing-5);
+      max-width: 400px;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-4);
+      text-align: center;
+      max-height: 90dvh;
+      overflow-y: auto;
+    }
+
+    .overlay-content h2 {
+      font-size: 1.75rem;
+      color: var(--color-dark);
+    }
+
+    .overlay-content p {
+      font-size: 1rem;
+      color: var(--color-text);
+      line-height: 1.5;
+    }
+
+    .overlay-actions {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-3);
+      width: 100%;
+    }
+
+    @media (max-width: 480px) {
+      #app { padding: var(--spacing-3); }
+      h1.display { font-size: 2rem; }
+      h2.display { font-size: 1.5rem; }
+      .mascot-container { max-width: 140px; }
+      .mascot-small { max-width: 100px; }
+      .board { max-width: 280px; }
+      .status-message { max-width: 280px; }
+      .scoreboard { max-width: 280px; }
+      .game-controls { max-width: 280px; }
+    }
+
+    @media (min-width: 768px) {
+      #app { max-width: 600px; }
+      .board { max-width: 360px; }
+      .status-message { max-width: 360px; }
+      .scoreboard { max-width: 360px; }
+      .game-controls { max-width: 360px; }
+    }
+
+    @media (orientation: landscape) and (max-height: 500px) {
+      #app { padding: var(--spacing-2); }
+      .mascot-container { max-width: 100px; }
+      .mascot-small { max-width: 80px; }
+      .screen { gap: var(--spacing-3); }
+      .board { max-width: 240px; }
+      .game-header { flex-direction: row; justify-content: space-between; }
+      .scoreboard { max-width: 200px; }
+      .status-message { max-width: 240px; }
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--color-accent);
+      outline-offset: 2px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- Menu Screen -->
+    <section id="menu-screen" class="screen active">
+      <header class="app-header">
+        <h1 class="display">TTT Maskot</h1>
+        <p class="subtitle">Tantang NPC dengan berbagai kesulitan</p>
+      </header>
+      <div id="menu-mascot" class="mascot-container"></div>
+      <div class="menu-actions">
+        <button id="btn-start" class="btn btn-primary">Mulai Bermain</button>
+        <button id="btn-howto" class="btn btn-secondary">Cara Bermain</button>
+      </div>
+      <div class="settings-panel">
+        <label for="difficulty-select" class="settings-label">Tingkat Kesulitan</label>
+        <select id="difficulty-select" class="select">
+          <option value="easy">Mudah</option>
+          <option value="medium">Sedang</option>
+          <option value="hard">Sulit</option>
+          <option value="impossible">Mustahil</option>
+        </select>
+        <button id="sound-toggle" class="btn btn-toggle" aria-pressed="true">
+          <span id="sound-toggle-text">Suara: Nyala</span>
+        </button>
+        <button id="btn-reset-score" class="btn btn-text">Reset Skor</button>
+      </div>
+      <footer class="app-footer">
+        <p>Maskot interaktif &copy; 2025</p>
+      </footer>
+    </section>
+
+    <!-- Game Screen -->
+    <section id="game-screen" class="screen">
+      <div class="game-header">
+        <h2 class="display">TTT Maskot</h2>
+        <div class="scoreboard">
+          <div class="score-item"><span class="score-label">Kamu</span><span id="score-wins" class="score-value">0</span></div>
+          <div class="score-item"><span class="score-label">NPC</span><span id="score-losses" class="score-value">0</span></div>
+          <div class="score-item"><span class="score-label">Seri</span><span id="score-draws" class="score-value">0</span></div>
+        </div>
+      </div>
+      <p id="status-message" class="status-message" aria-live="polite">Giliranmu! Pilih kotak.</p>
+      <div id="game-mascot" class="mascot-container mascot-small"></div>
+      <div id="board" class="board" role="grid" aria-label="Papan Tic-Tac-Toe">
+        <button class="cell" data-index="0" role="gridcell" aria-label="Sel 1, kosong"></button>
+        <button class="cell" data-index="1" role="gridcell" aria-label="Sel 2, kosong"></button>
+        <button class="cell" data-index="2" role="gridcell" aria-label="Sel 3, kosong"></button>
+        <button class="cell" data-index="3" role="gridcell" aria-label="Sel 4, kosong"></button>
+        <button class="cell" data-index="4" role="gridcell" aria-label="Sel 5, kosong"></button>
+        <button class="cell" data-index="5" role="gridcell" aria-label="Sel 6, kosong"></button>
+        <button class="cell" data-index="6" role="gridcell" aria-label="Sel 7, kosong"></button>
+        <button class="cell" data-index="7" role="gridcell" aria-label="Sel 8, kosong"></button>
+        <button class="cell" data-index="8" role="gridcell" aria-label="Sel 9, kosong"></button>
+      </div>
+      <div class="game-controls">
+        <button id="btn-game-restart" class="btn btn-secondary">Ulangi</button>
+        <button id="btn-game-menu" class="btn btn-text">Menu</button>
+      </div>
+    </section>
+
+    <!-- How To Screen -->
+    <section id="howto-screen" class="screen">
+      <h2 class="display">Cara Bermain</h2>
+      <div class="howto-content">
+        <p>Kamu adalah <strong>X</strong>, NPC adalah <strong>O</strong>.</p>
+        <p>Letakkan tiga tanda dalam satu baris (horizontal, vertikal, atau diagonal) untuk menang.</p>
+        <p>Klik kotak kosong untuk menempatkan X. NPC akan berpikir sebelum memilih.</p>
+        <h3>Tingkat Kesulitan</h3>
+        <ul>
+          <li><strong>Mudah</strong>: NPC memilih acak.</li>
+          <li><strong>Sedang</strong>: NPC kadang membuat kesalahan.</li>
+          <li><strong>Sulit</strong>: NPC sering bermain optimal.</li>
+          <li><strong>Mustahil</strong>: NPC tidak pernah membuat kesalahan.</li>
+        </ul>
+        <h3>Pintasan Keyboard</h3>
+        <ul>
+          <li><kbd>ESC</kbd> / <kbd>P</kbd>: Kembali ke menu</li>
+          <li><kbd>R</kbd>: Ulangi permainan</li>
+          <li><kbd>M</kbd>: Matikan/nyalakan suara</li>
+        </ul>
+      </div>
+      <button id="btn-back-menu" class="btn btn-primary">Kembali ke Menu</button>
+    </section>
+  </div>
+
+  <!-- Onboarding Overlay -->
+  <div id="onboarding-overlay" class="overlay" style="display:none;">
+    <div class="overlay-content">
+      <div id="onboarding-mascot" class="mascot-container"></div>
+      <h2>Selamat Datang!</h2>
+      <p>Kamu akan bermain Tic-Tac-Toe melawan NPC yang ekspresif.</p>
+      <p>Letakkan tiga X dalam satu baris untuk menang. NPC akan berpikir sebelum melangkah.</p>
+      <p>Gunakan pengaturan untuk memilih tingkat kesulitan.</p>
+      <button id="btn-onboarding-start" class="btn btn-primary">Mengerti, Mulai!</button>
+    </div>
+  </div>
+
+  <!-- Result Overlay -->
+  <div id="result-overlay" class="overlay" style="display:none;">
+    <div class="overlay-content">
+      <div id="result-mascot" class="mascot-container"></div>
+      <h2 id="result-title">Hasil</h2>
+      <p id="result-message">...</p>
+      <div class="overlay-actions">
+        <button id="btn-result-again" class="btn btn-primary">Main Lagi</button>
+        <button id="btn-result-menu" class="btn btn-secondary">Menu</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      'use strict';
+
+      // ============================================================
+      // KONSTANTA
+      // ============================================================
+      const STORAGE_KEY = 'ttt_maskot_v1';
+      const DIFFICULTIES = ['easy', 'medium', 'hard', 'impossible'];
+      const SVG_X = `<svg viewBox="0 0 100 100" class="mark-svg"><path d="M20,20 L80,80 M80,20 L20,80" stroke="var(--color-primary)" stroke-width="12" stroke-linecap="round"/></svg>`;
+      const SVG_O = `<svg viewBox="0 0 100 100" class="mark-svg"><circle cx="50" cy="50" r="30" stroke="var(--color-primary-light)" stroke-width="12" fill="none"/></svg>`;
+
+      const MASCOT_SVG = `
+        <svg viewBox="0 0 200 200" class="mascot-svg" aria-hidden="true">
+          <path d="M40,100 Q20,30 100,20 Q180,30 160,100 L160,150 Q140,180 100,180 Q60,180 40,150 Z" fill="#b83b2e"/>
+          <ellipse cx="100" cy="105" rx="55" ry="60" fill="#ffe6d5"/>
+          <path d="M45,90 Q60,40 100,45 Q140,40 155,90 Q140,75 120,70 Q100,65 80,70 Q60,75 45,90 Z" fill="#b83b2e"/>
+          <path d="M45,90 Q30,120 40,155 Q50,140 50,120 Q55,100 45,90 Z" fill="#b83b2e"/>
+          <path d="M155,90 Q170,120 160,155 Q150,140 150,120 Q145,100 155,90 Z" fill="#b83b2e"/>
+          <path d="M100,20 Q115,-5 135,0 Q125,15 110,25 Z" fill="#b83b2e"/>
+          <path d="M80,165 L65,185 L85,175 L100,185 L115,175 L135,185 L120,165 Z" fill="#3a2a24"/>
+          <circle cx="100" cy="170" r="6" fill="#f7c548"/>
+          <g class="mascot-thinking-group">
+            <path d="M65,100 Q75,95 85,100" stroke="#3a2a24" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <path d="M115,100 Q125,95 135,100" stroke="#3a2a24" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <circle cx="82" cy="103" r="5" fill="#3a2a24"/>
+            <circle cx="122" cy="103" r="5" fill="#3a2a24"/>
+            <path d="M60,90 Q72,85 82,90" stroke="#3a2a24" stroke-width="2.5" fill="none"/>
+            <path d="M118,90 Q128,85 140,90" stroke="#3a2a24" stroke-width="2.5" fill="none"/>
+            <path d="M90,122 Q100,128 110,122" stroke="#3a2a24" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <ellipse cx="65" cy="115" rx="10" ry="5" fill="#f7c548" opacity="0.5"/>
+            <ellipse cx="135" cy="115" rx="10" ry="5" fill="#f7c548" opacity="0.5"/>
+          </g>
+          <g class="mascot-happy-group" style="display:none;">
+            <path d="M60,100 Q75,85 90,100" stroke="#3a2a24" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <path d="M110,100 Q125,85 140,100" stroke="#3a2a24" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <ellipse cx="100" cy="125" rx="18" ry="14" fill="#e85d4a"/>
+            <ellipse cx="100" cy="122" rx="12" ry="8" fill="#ff8a7a"/>
+            <ellipse cx="65" cy="115" rx="12" ry="6" fill="#f7c548" opacity="0.7"/>
+            <ellipse cx="135" cy="115" rx="12" ry="6" fill="#f7c548" opacity="0.7"/>
+            <path d="M170,60 L175,50 L180,60 L190,65 L180,70 L175,80 L170,70 L160,65 Z" fill="#f7c548" opacity="0.8"/>
+            <path d="M30,50 L33,43 L36,50 L43,53 L36,56 L33,63 L30,56 L23,53 Z" fill="#f7c548" opacity="0.8"/>
+          </g>
+        </svg>
+      `;
+
+      // ============================================================
+      // STATE
+      // ============================================================
+      let state = {
+        screen: 'menu',
+        board: Array(9).fill(null),
+        currentPlayer: 'X',
+        gameOver: false,
+        difficulty: 'medium',
+        score: { wins: 0, losses: 0, draws: 0 },
+        soundOn: true,
+        onboardingSeen: false,
+        npcThinking: false,
+        timeoutIds: [],
+        audioCtx: null,
+        isPaused: false,
+      };
+
+      // ============================================================
+      // DOM CACHE
+      // ============================================================
+      const els = {};
+
+      // ============================================================
+      // INIT
+      // ============================================================
+      document.addEventListener('DOMContentLoaded', init);
+
+      function init() {
+        cacheDOM();
+        injectMascots();
+        loadState();
+        setupEventListeners();
+        initAudioContextOnFirstGesture();
+        renderAll();
+        if (!state.onboardingSeen) {
+          showOnboarding();
+        }
+        history.pushState({ page: 'menu' }, '', location.href);
+        window.addEventListener('popstate', handlePopState);
+      }
+
+      function cacheDOM() {
+        els.menuScreen = document.getElementById('menu-screen');
+        els.gameScreen = document.getElementById('game-screen');
+        els.howtoScreen = document.getElementById('howto-screen');
+        els.onboardingOverlay = document.getElementById('onboarding-overlay');
+        els.resultOverlay = document.getElementById('result-overlay');
+        els.resultTitle = document.getElementById('result-title');
+        els.resultMessage = document.getElementById('result-message');
+        els.btnStart = document.getElementById('btn-start');
+        els.btnHowto = document.getElementById('btn-howto');
+        els.btnBackMenu = document.getElementById('btn-back-menu');
+        els.btnResetScore = document.getElementById('btn-reset-score');
+        els.btnOnboardingStart = document.getElementById('btn-onboarding-start');
+        els.btnResultAgain = document.getElementById('btn-result-again');
+        els.btnResultMenu = document.getElementById('btn-result-menu');
+        els.difficultySelect = document.getElementById('difficulty-select');
+        els.soundToggle = document.getElementById('sound-toggle');
+        els.soundToggleText = document.getElementById('sound-toggle-text');
+        els.scoreWins = document.getElementById('score-wins');
+        els.scoreLosses = document.getElementById('score-losses');
+        els.scoreDraws = document.getElementById('score-draws');
+        els.statusMessage = document.getElementById('status-message');
+        els.board = document.getElementById('board');
+        els.btnGameMenu = document.getElementById('btn-game-menu');
+        els.btnGameRestart = document.getElementById('btn-game-restart');
+        els.menuMascot = document.getElementById('menu-mascot');
+        els.gameMascot = document.getElementById('game-mascot');
+        els.onboardingMascot = document.getElementById('onboarding-mascot');
+        els.resultMascot = document.getElementById('result-mascot');
+      }
+
+      function injectMascots() {
+        els.menuMascot.innerHTML = MASCOT_SVG;
+        els.gameMascot.innerHTML = MASCOT_SVG;
+        els.onboardingMascot.innerHTML = MASCOT_SVG;
+        els.resultMascot.innerHTML = MASCOT_SVG;
+        setMascot(els.menuMascot, 'happy');
+        setMascot(els.gameMascot, 'thinking');
+        setMascot(els.onboardingMascot, 'happy');
+      }
+
+      // ============================================================
+      // PERSISTENSI
+      // ============================================================
+      function loadState() {
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (stored) {
+            const data = JSON.parse(stored);
+            if (data && typeof data === 'object') {
+              if (data.score && typeof data.score.wins === 'number') state.score = data.score;
+              if (DIFFICULTIES.includes(data.difficulty)) state.difficulty = data.difficulty;
+              if (typeof data.soundOn === 'boolean') state.soundOn = data.soundOn;
+              if (typeof data.onboardingSeen === 'boolean') state.onboardingSeen = data.onboardingSeen;
+            }
+          }
+        } catch (e) {
+          state.score = { wins: 0, losses: 0, draws: 0 };
+          state.difficulty = 'medium';
+          state.soundOn = true;
+          state.onboardingSeen = false;
+        }
+      }
+
+      function saveState() {
+        try {
+          const toSave = {
+            score: state.score,
+            difficulty: state.difficulty,
+            soundOn: state.soundOn,
+            onboardingSeen: state.onboardingSeen
+          };
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+        } catch (e) {}
+      }
+
+      // ============================================================
+      // RENDER
+      // ============================================================
+      function renderAll() {
+        renderScreen();
+        renderScore();
+        renderDifficulty();
+        renderSoundToggle();
+        renderBoard();
+        updateStatusMessage();
+      }
+
+      function renderScreen() {
+        els.menuScreen.classList.toggle('active', state.screen === 'menu');
+        els.gameScreen.classList.toggle('active', state.screen === 'game');
+        els.howtoScreen.classList.toggle('active', state.screen === 'howto');
+      }
+
+      function renderScore() {
+        els.scoreWins.textContent = state.score.wins;
+        els.scoreLosses.textContent = state.score.losses;
+        els.scoreDraws.textContent = state.score.draws;
+      }
+
+      function renderDifficulty() {
+        els.difficultySelect.value = state.difficulty;
+      }
+
+      function renderSoundToggle() {
+        els.soundToggleText.textContent = state.soundOn ? 'Suara: Nyala' : 'Suara: Mati';
+        els.soundToggle.setAttribute('aria-pressed', state.soundOn ? 'true' : 'false');
+      }
+
+      function renderBoard() {
+        const cells = els.board.querySelectorAll('.cell');
+        cells.forEach((cell, i) => {
+          const val = state.board[i];
+          cell.innerHTML = val === 'X' ? SVG_X : val === 'O' ? SVG_O : '';
+          cell.disabled = val !== null || state.gameOver || state.npcThinking || state.currentPlayer !== 'X';
+          cell.setAttribute('aria-label', val ? `Sel ${i+1}, ${val}` : `Sel ${i+1}, kosong`);
+        });
+      }
+
+      function setMascot(container, expr) {
+        const thinking = container.querySelector('.mascot-thinking-group');
+        const happy = container.querySelector('.mascot-happy-group');
+        if (!thinking || !happy) return;
+        if (expr === 'thinking') {
+          thinking.style.display = '';
+          happy.style.display = 'none';
+        } else {
+          thinking.style.display = 'none';
+          happy.style.display = '';
+       
